@@ -17,6 +17,9 @@ package org.gitia.tipo3.fitness;
 
 import java.util.Collections;
 import java.util.List;
+import org.ejml.simple.SimpleMatrix;
+import org.gitia.froog.Feedforward;
+import org.gitia.froog.statistics.Compite;
 import org.gitia.tipo3.population.Individuo;
 import org.gitia.tipo3.population.IndividuoComparator;
 
@@ -24,18 +27,24 @@ import org.gitia.tipo3.population.IndividuoComparator;
  *
  * @author Matías Roodschild <mroodschild@gmail.com>
  */
-public class FitnessCuadratic implements Fitness{
+public class FitnessClassification implements Fitness{
+    
+    SimpleMatrix input;
+    SimpleMatrix output;
+    
+    Feedforward net = new Feedforward();
 
-    /**
-     * agrega el fit y ordena la población
-     *
-     * @param pop
-     */
     @Override
     public void fit(List<Individuo> pop) {
         for (int i = 0; i < pop.size(); i++) {
             Individuo gen = pop.get(i);
-            double fit = gen.getDna().elementPower(2).elementSum() * -1;
+            net.setParameters(gen.getDna());
+            SimpleMatrix out = net.output(input);
+//            out.printDimensions();
+            out = Compite.eval(out.transpose());
+//            out.printDimensions();
+//            output.printDimensions();
+            double fit = out.transpose().elementMult(output).elementSum();
             gen.setFitness(fit);
         }
         Collections.sort(pop, new IndividuoComparator());
@@ -58,4 +67,17 @@ public class FitnessCuadratic implements Fitness{
         mean = sum / (double) population.size();
         System.out.println("it:\t" + iteration +"\tBest:\t" + best + "\tmean:\t" + mean + "\tidx best:\t" + idxBest);
     }
+
+    public void setInput(SimpleMatrix input) {
+        this.input = input;
+    }
+
+    public void setOutput(SimpleMatrix output) {
+        this.output = output;
+    }
+
+    public void setNet(Feedforward net) {
+        this.net = net;
+    }
+    
 }

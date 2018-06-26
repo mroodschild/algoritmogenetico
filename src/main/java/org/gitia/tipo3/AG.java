@@ -17,6 +17,7 @@ package org.gitia.tipo3;
 
 import java.util.List;
 import org.gitia.tipo3.crossover.Crossover;
+import org.gitia.tipo3.fitness.Fitness;
 import org.gitia.tipo3.fitness.FitnessCuadratic;
 import org.gitia.tipo3.mutation.Mutation;
 import org.gitia.tipo3.population.Individuo;
@@ -36,6 +37,7 @@ public class AG {
     double min = -3;
     double max = 3;
     List<Individuo> population;
+    Fitness fitness = new FitnessCuadratic();
 
     public AG() {
         this(50, 20, 10, 0.2, 0.2);
@@ -53,7 +55,7 @@ public class AG {
         //initial population
         population = Population.generate(populationSize, dnaSize, min, max);
         //iterations
-        FitnessCuadratic.fit(population);
+        fitness.fit(population);
         for (int i = 0; i < epoch; i++) {
             //fit y orden
             //elite
@@ -64,9 +66,8 @@ public class AG {
             //mutation
             Mutation.mutation(population, mutation, elite, min, max);
             //end?
-            FitnessCuadratic.fit(population);
-            System.out.println("it:\t"+i);
-            FitnessCuadratic.printResume(population);
+            fitness.fit(population);
+            fitness.printResume(population, i);
         }
         //return solution
     }
@@ -85,6 +86,34 @@ public class AG {
 
     public double getMutation() {
         return mutation;
+    }
+
+    public void setFitness(Fitness fitness) {
+        this.fitness = fitness;
+    }
+
+    public void setEpoch(int epoch) {
+        this.epoch = epoch;
+    }
+
+    public void setMax(double max) {
+        this.max = max;
+    }
+
+    public void setMin(double min) {
+        this.min = min;
+    }
+
+    public void setPopulationSize(int populationSize) {
+        this.populationSize = populationSize;
+    }
+
+    public void setPopulation(List<Individuo> population) {
+        this.population = population;
+    }
+
+    public void setDnaSize(int dnaSize) {
+        this.dnaSize = dnaSize;
     }
 
 }
