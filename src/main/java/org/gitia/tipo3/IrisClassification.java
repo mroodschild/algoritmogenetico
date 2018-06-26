@@ -15,7 +15,6 @@
  */
 package org.gitia.tipo3;
 
-import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 import org.gitia.froog.Feedforward;
 import org.gitia.froog.layer.Layer;
