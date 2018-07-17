@@ -40,7 +40,7 @@ public class Crossover {
             }
             SimpleMatrix p2 = population.get(idx2).getDna();
             SimpleMatrix son = cross(p1, p2);
-            population.get(i).setDna(son);
+            population.get(i).setDna(son);//corregir cruzamos a los hijos
         }
     }
 
