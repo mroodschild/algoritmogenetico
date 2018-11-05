@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
-import static org.gitia.tipo3.mutation.Mutation.r;
 import org.gitia.tipo3.population.Individuo;
 
 /**
@@ -31,7 +30,8 @@ public class MultiNonUniformMutation {
     static Random r = new Random();
 
     //public static void mutation(List<Individuo> population, SimpleMatrix bounds, double mutation, double elite, double min, double max) {
-    public static void mutacion(List<Individuo> population, SimpleMatrix bounds, double mutation, double elite, double max, double min, int genAct, int getMax) {
+    public static void mutacion(List<Individuo> population, 
+            double mutation, double elite, double max, double min, int genAct, int getMax) {
 
         SimpleMatrix vdir = population.get(0).getDna().copy();
         SimpleMatrix vmax = population.get(0).getDna().copy();
@@ -45,9 +45,9 @@ public class MultiNonUniformMutation {
             if (r.nextDouble() < mutation) {
                 Individuo ind = new Individuo();
                 setDir(vdir);
-                setMaxChg(vmax, vdir, population.get(i), max, min);
+                setMaxChg(vmax, vdir, population.get(i).getDna(), max, min);
                 step(step, genAct, getMax);
-                ind.setDna(sol(ind, vdir, step, vmax));
+                ind.setDna(sol(ind.getDna(), vdir, step, vmax));
                 aux.add(ind);
             }else{
                 aux.add(population.get(i));
@@ -60,7 +60,7 @@ public class MultiNonUniformMutation {
      *
      * @param dir
      */
-    static private void setDir(SimpleMatrix dir) {
+    static public void setDir(SimpleMatrix dir) {
         for (int i = 0; i < dir.getNumElements(); i++) {
             dir.set(i, Math.pow(-1, Math.round(r.nextDouble())));
         }
@@ -69,32 +69,32 @@ public class MultiNonUniformMutation {
     /**
      * genera el vector de máximos cambios posibles
      *
-     * @param vmax aqui se guarda
+     * @param vMaxChg aqui se guarda
      * @param dir direcciones generadas
      * @param ind individuo
-     * @param bound límites
+     * @param max
+     * @param min
      */
-    static private void setMaxChg(SimpleMatrix vmax, SimpleMatrix dir, Individuo ind, double max, double min) {
-        for (int i = 0; i < vmax.getNumElements(); i++) {
+    static public void setMaxChg(SimpleMatrix vMaxChg, SimpleMatrix dir, SimpleMatrix ind, double max, double min) {
+        for (int i = 0; i < vMaxChg.getNumElements(); i++) {
             if (dir.get(i) == 1) {
-                vmax.set(i, max - ind.getDna().get(i));
+                vMaxChg.set(i, max - ind.get(i));
             } else {
-                vmax.set(i, ind.getDna().get(i) - min);
+                vMaxChg.set(i, ind.get(i) - min);
             }
 
         }
     }
 
-    static private void step(SimpleMatrix step, int genAct, int genMax) {
+    static public void step(SimpleMatrix step, int genAct, int genMax) {
         for (int i = 0; i < step.getNumElements(); i++) {
             step.set(i, r.nextDouble() * (1 - (double) genAct / (double) genMax));
         }
     }
 
-    static private SimpleMatrix sol(Individuo ind, SimpleMatrix dir, SimpleMatrix step, SimpleMatrix max) {
-        SimpleMatrix sol = ind.getDna().copy();
-        SimpleMatrix b = dir.elementMult(step).elementMult(max);
-        sol = sol.plus(b);
+    static public SimpleMatrix sol(SimpleMatrix ind, SimpleMatrix dir, SimpleMatrix step, SimpleMatrix maxChange) {
+        SimpleMatrix sol = ind.copy();
+        sol = sol.plus(dir.elementMult(step).elementMult(maxChange));
         return sol;
     }
 }
