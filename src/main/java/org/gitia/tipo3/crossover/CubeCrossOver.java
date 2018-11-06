@@ -15,6 +15,7 @@
  */
 package org.gitia.tipo3.crossover;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
@@ -28,9 +29,14 @@ public class CubeCrossOver {
 
     static Random r = new Random();
 
-    public static void crossover(List<Individuo> population, double elite) {
-        int eliteSize = (int) Math.round(population.size() * elite);
-        int size = (elite > 0) ? population.size() - eliteSize : population.size();
+    /**
+     * enviamos la lista de individuos a cruzar
+     * @param population 
+     * @return  
+     */
+    public static List<Individuo> crossover(List<Individuo> population) {
+        List<Individuo> indAux = new ArrayList<>();
+        int size = population.size();
         for (int i = 0; i < size; i++) {
             int idx1 = r.nextInt(population.size());
             SimpleMatrix p1 = population.get(idx1).getDna();
@@ -42,6 +48,7 @@ public class CubeCrossOver {
             SimpleMatrix son = cross(p1, p2);
             population.get(i).setDna(son);//corregir cruzamos a los hijos
         }
+        return indAux;
     }
 
     static private SimpleMatrix cross(SimpleMatrix p1, SimpleMatrix p2) {

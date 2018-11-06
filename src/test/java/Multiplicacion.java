@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gitia.tipo3;
 
 /**
  *
  * @author Matías Roodschild <mroodschild@gmail.com>
  */
-public class Main {
-    
+public class Multiplicacion {
     public static void main(String[] args) {
-        AG3 ag = new AG3(50, 50, 4, 0.1, 0.02);
-        ag.run();
+        int a = 8;
+        double b = 0.25;
+        int c = (int)(b * a);
+        System.out.println(a * b+ "\tc\t"+c);
     }
-    
 }

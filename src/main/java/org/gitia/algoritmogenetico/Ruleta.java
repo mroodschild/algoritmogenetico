@@ -13,17 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gitia.tipo3;
+package org.gitia.algoritmogenetico;
+
+import java.util.List;
+import org.gitia.tipo3.population.Individuo;
 
 /**
  *
  * @author Matías Roodschild <mroodschild@gmail.com>
  */
-public class Main {
-    
-    public static void main(String[] args) {
-        AG3 ag = new AG3(50, 50, 4, 0.1, 0.02);
-        ag.run();
+class Ruleta {
+
+    /**
+     * 
+     * @param offspring para saber cuantos cruzamientos se requieren
+     * @param population para poder seleccionar la elite en el cruzamiento
+     * @return los indices de p1 y p2
+     */
+    static double[][] getParing(int offspring, List<Individuo> population) {
+        int cant = (int)(offspring/2);
+        double[][] indices = new double[cant][2];
+        return indices;
     }
     
 }
