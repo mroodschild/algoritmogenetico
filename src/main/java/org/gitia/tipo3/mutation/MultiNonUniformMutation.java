@@ -57,7 +57,7 @@ public class MultiNonUniformMutation {
             int idx = r.nextInt(population_nocruzada.size() - 1);
             Individuo ind = population_nocruzada.get(idx);
             setDir(vdir);
-            setMaxChg(vmax, vdir, ind.getDna(), max, min);
+            setMaxChg(vmax, vdir, ind.getDna(), min, max);
             step(step, genAct, getMax);
             ind.setDna(sol(ind.getDna(), vdir, step, vmax));
             aux.add(ind);
@@ -86,7 +86,8 @@ public class MultiNonUniformMutation {
      * @param max
      * @param min
      */
-    static public void setMaxChg(SimpleMatrix vMaxChg, SimpleMatrix dir, SimpleMatrix ind, double max, double min) {
+    static public void setMaxChg(SimpleMatrix vMaxChg, SimpleMatrix dir, 
+            SimpleMatrix ind, double min, double max) {
         for (int i = 0; i < vMaxChg.getNumElements(); i++) {
             if (dir.get(i) == 1) {
                 vMaxChg.set(i, max - ind.get(i));

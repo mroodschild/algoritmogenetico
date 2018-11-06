@@ -19,11 +19,11 @@ package org.gitia.tipo3;
  *
  * @author Matías Roodschild <mroodschild@gmail.com>
  */
-public class Main {
-    
+public class MainAG1 {
+
     public static void main(String[] args) {
-        AG3 ag = new AG3(100, 50, 4, 0.01, 0.05);
+        AG1 ag = new AG1(100, 100, 4, 0.02, 0.05, -1, 1);
         ag.run();
     }
-    
+
 }

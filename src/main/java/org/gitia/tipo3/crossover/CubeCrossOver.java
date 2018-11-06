@@ -56,7 +56,7 @@ public class CubeCrossOver {
      * @return R .* (p2 - p1) + p1
      */
     static private SimpleMatrix cross(SimpleMatrix p1, SimpleMatrix p2) {
-        SimpleMatrix rand = SimpleMatrix.random_DDRM(1, p1.getNumElements(), -1.25, 1.25, r);
+        SimpleMatrix rand = SimpleMatrix.random_DDRM(1, p1.getNumElements(), -0.5, 0.5, r);
         SimpleMatrix son = p2.minus(p1).elementMult(rand).plus(p1);
         return son;
     }

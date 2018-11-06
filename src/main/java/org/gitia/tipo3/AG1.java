@@ -89,12 +89,24 @@ public class AG1 {
         int numMutacion = (int) (populationSize * mutation);
         int numSeleccion = (int) (populationSize * 0.05);
         int offspring = (int) (populationSize - (numElite + numMutacion + numSeleccion));
+        
         List<Individuo> listElite = new ArrayList<>();
         List<Individuo> listPoblacionSeleccionada = new ArrayList<>();
         List<Individuo> listOffspring = new ArrayList<>();
         List<Individuo> listNoCruzada = new ArrayList<>();
 
         population = Population.generate(populationSize, dnaSize, min, max);
+        
+        System.out.println("elite porcentaje:\t"+elite_porcentaje+
+                "\tMutación\t"+mutation
+                );
+        System.out.println("Poblacion\t"+population.size()+"\telite\t"+numElite+
+                "\tnumMutacion\t"+numMutacion+
+                "\tnumSeleccion\t"+numSeleccion+
+                "\toffspring\t"+offspring
+        );
+        
+        
         //iterations
         fitness.fit(population);
         // separar la elite
