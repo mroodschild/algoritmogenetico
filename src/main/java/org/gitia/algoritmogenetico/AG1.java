@@ -16,11 +16,15 @@
 package org.gitia.algoritmogenetico;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.lang3.ArrayUtils;
 import org.gitia.tipo3.crossover.Crossover;
+import org.gitia.tipo3.crossover.CubeCrossOver;
 import org.gitia.tipo3.fitness.Fitness;
 import org.gitia.tipo3.fitness.FitnessCuadratic;
+import org.gitia.tipo3.mutation.MultiNonUniformMutation;
 import org.gitia.tipo3.mutation.Mutation;
 import org.gitia.tipo3.population.Individuo;
 import org.gitia.tipo3.population.IndividuoComparator;
@@ -35,10 +39,10 @@ public class AG1 {
     int epoch;
     int populationSize;
     int dnaSize;
-    double elite;
+    double elite_porcentaje;
     double mutation;
-    double min = -3;
-    double max = 3;
+    double min = -1;
+    double max = 1;
     List<Individuo> population;
     Fitness fitness = new FitnessCuadratic();
 
@@ -49,7 +53,7 @@ public class AG1 {
     public AG1(int epoch, int populationSize, int dnaSize, double elite, double mutation) {
         this.epoch = epoch;
         this.populationSize = populationSize;
-        this.elite = elite;
+        this.elite_porcentaje = elite;
         this.dnaSize = dnaSize;
         this.mutation = mutation;
     }
@@ -58,7 +62,7 @@ public class AG1 {
         this.epoch = epoch;
         this.populationSize = populationSize;
         this.dnaSize = dnaSize;
-        this.elite = elite;
+        this.elite_porcentaje = elite;
         this.mutation = mutation;
         this.min = min;
         this.max = max;
@@ -66,12 +70,16 @@ public class AG1 {
 
     public void run() {
         //initial population
-        int numElite = (int) (populationSize * elite);
+        int numElite = (int) (populationSize * elite_porcentaje);
         int numMutacion = (int) (populationSize * mutation);
         int numSeleccion = (int) (populationSize * 0.05);
         int offspring = (int) (populationSize - (numElite + numMutacion + numSeleccion));
         List<Individuo> listElite = new ArrayList<>();
-        List<Individuo> poblacionSeleccionada = new ArrayList<>();
+        List<Individuo> listPoblacionSeleccionada = new ArrayList<>();
+        List<Individuo> listOffspring = new ArrayList<>();
+        List<Individuo> listNoCruzada = new ArrayList<>();
+        List<Individuo> listMutación = new ArrayList<>();
+        List<Individuo> listSinParticipacion = new ArrayList<>();
 
         population = Population.generate(populationSize, dnaSize, min, max);
         //iterations
@@ -82,20 +90,23 @@ public class AG1 {
             //fit y orden de menor a mayor
             Collections.sort(population, new IndividuoComparator());
             listElite.clear();
-            separarElite(population, listElite, numElite, poblacionSeleccionada);
+            separarElite(population, listElite, numElite, listPoblacionSeleccionada);
             //elite
             //seleccionamos para hacer el cruzamiento
-            double[][] paring = Ruleta.getParing(offspring, population);
+            int[][] paring = Ruleta.getParing(offspring, population);
+            //separarOffspringSelNoCruzada(paring, population, listPoblacionSeleccionada, listCrossOver, listNoCruzada);
             //realizamos el cruzamiento
             //guardamos el cruzamiento
             //de la parte que no se cruzará
             //seleccionamos al azar los que se mutarán
             //mutamos y dejamos pasar a los que no se mutan
             //unimos el offspring, con los mutados, los seleccionados y la elite
-            Crossover.crossover(population, elite);
+            listOffspring = CubeCrossOver.crossover(population, paring);
+            listNoCruzada = separarSeleccionNoCruzada(paring, population, numElite);
             //offspring
+
             //mutation
-            Mutation.mutation(population, mutation, elite, min, max);
+            Mutation.mutation(population, mutation, elite_porcentaje, min, max);
             //end?
             fitness.fit(population);
             fitness.printResume(population, i);
@@ -114,18 +125,48 @@ public class AG1 {
             List<Individuo> listElite, int numElite,
             List<Individuo> poblacionSeleccionada) {
         for (int i = populationSize - 1; i >= 0; i--) {
-            if (i >= (populationSize - elite - 1)) {
+            if (i >= (populationSize - numElite - 1)) {
                 Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
                 listElite.add(ind);
-            }else{
+            } else {
                 Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
                 poblacionSeleccionada.add(ind);
             }
         }
     }
 
+    private List<Individuo> separarSeleccionNoCruzada(int[][] paring, List<Individuo> population, int numElite) {
+        List<Individuo> selNoCruzada = new ArrayList<>();
+        int[] indicesCruzados = new int[paring.length * 2];
+        int[] indicesPoblacion = new int[population.size()];
+        int[] idxNoCruzados;
+        int k = 0;
+        //ponemos los padres en un listado
+        for (int[] paring1 : paring) {
+            for (int j = 0; j < paring[0].length; j++) {
+                indicesCruzados[k++] = paring1[j];
+            }
+        }
+        //quitamos los padres repetidos
+        indicesCruzados = java.util.stream.IntStream.of(indicesCruzados).distinct().toArray();
+
+        //creamos los indices de la población
+        for (int i = 0; i < population.size(); i++) {
+            indicesPoblacion[i] = i;
+        }
+
+        // removemos los indices que ya fueron cruzados
+        idxNoCruzados = ArrayUtils.removeElements(indicesPoblacion, indicesCruzados);
+        
+        //generamos la lista de los no cruzados
+        for (int i = 0; i < idxNoCruzados.length; i++) {
+            selNoCruzada.add(new Individuo(population.get(idxNoCruzados[i]).getDna(), population.get(idxNoCruzados[i]).getFitness()));
+        }
+        return selNoCruzada;
+    }
+
     public void setElite(double elite) {
-        this.elite = elite;
+        this.elite_porcentaje = elite;
     }
 
     public void setMutation(double mutation) {
@@ -133,7 +174,7 @@ public class AG1 {
     }
 
     public double getElite() {
-        return elite;
+        return elite_porcentaje;
     }
 
     public double getMutation() {

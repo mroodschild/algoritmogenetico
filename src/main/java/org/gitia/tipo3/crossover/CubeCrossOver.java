@@ -30,33 +30,34 @@ public class CubeCrossOver {
     static Random r = new Random();
 
     /**
-     * enviamos la lista de individuos a cruzar
-     * @param population 
-     * @return  
+     * enviamos la lista de individuos a cruzar, por cada par de padres se generan 2 hijos
+     *
+     * @param population lista completa de individuos
+     * @param paring indices de individuos a cruzar p1 con p2
+     * @return
      */
-    public static List<Individuo> crossover(List<Individuo> population) {
-        List<Individuo> indAux = new ArrayList<>();
-        int size = population.size();
-        for (int i = 0; i < size; i++) {
-            int idx1 = r.nextInt(population.size());
-            SimpleMatrix p1 = population.get(idx1).getDna();
-            int idx2 = r.nextInt(population.size());
-            while (idx1 == idx2) {
-                idx2 = r.nextInt(population.size());
-            }
-            SimpleMatrix p2 = population.get(idx2).getDna();
-            SimpleMatrix son = cross(p1, p2);
-            population.get(i).setDna(son);//corregir cruzamos a los hijos
+    public static List<Individuo> crossover(List<Individuo> population, int[][] paring) {
+        List<Individuo> crossPop = new ArrayList<>();
+        for (int[] paring1 : paring) {
+            SimpleMatrix p1 = population.get(paring1[0]).getDna();
+            SimpleMatrix p2 = population.get(paring1[1]).getDna();
+            SimpleMatrix son1 = cross(p1, p2);
+            SimpleMatrix son2 = cross(p2, p1);
+            crossPop.add(new Individuo(son1, 0));
+            crossPop.add(new Individuo(son2, 0));
         }
-        return indAux;
+        return crossPop;
     }
 
+    /**
+     * random entre -1.25 a 1.25
+     * @param p1
+     * @param p2
+     * @return R .* (p2 - p1) + p1
+     */
     static private SimpleMatrix cross(SimpleMatrix p1, SimpleMatrix p2) {
-        SimpleMatrix son = new SimpleMatrix(1, p1.numCols());
-        for (int i = 0; i < p1.numCols(); i++) {
-            double v = (r.nextDouble() < 0.5) ? p1.get(i) : p2.get(i);
-            son.set(i, v);
-        }
+        SimpleMatrix rand = SimpleMatrix.random_DDRM(1, p1.getNumElements(), -1.25, 1.25, r);
+        SimpleMatrix son = p2.minus(p1).elementMult(rand).plus(p1);
         return son;
     }
 }
