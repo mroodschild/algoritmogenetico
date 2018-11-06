@@ -15,18 +15,10 @@
  */
 package org.gitia.tipo3.mutation;
 
-import java.util.List;
 import org.ejml.simple.SimpleMatrix;
 import static org.gitia.tipo3.mutation.MultiNonUniformMutation.r;
-import org.gitia.tipo3.population.Individuo;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.Ignore;
-import sun.java2d.pipe.SpanShapeRenderer;
 
 /**
  *
@@ -35,22 +27,6 @@ import sun.java2d.pipe.SpanShapeRenderer;
 public class MultiNonUniformMutationTest {
 
     public MultiNonUniformMutationTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
     }
 
     /**
@@ -72,6 +48,7 @@ public class MultiNonUniformMutationTest {
 //        fail("The test case is a prototype.");
 //    }
 
+    @Ignore
     @Test
     public void testSetDir() {
         System.out.println("org.gitia.tipo3.mutation.MultiNonUniformMutationTest.testSetDir()");
@@ -83,6 +60,7 @@ public class MultiNonUniformMutationTest {
         v.print();
     }
 
+    @Ignore
     @Test
     public void testSetMaxChg() {
         System.out.println("org.gitia.tipo3.mutation.MultiNonUniformMutationTest.testSetMaxChg()");
@@ -112,6 +90,7 @@ public class MultiNonUniformMutationTest {
         vMaxChg.print();
     }
 
+    @Ignore
     @Test
     public void testStep() {
         System.out.println("org.gitia.tipo3.mutation.MultiNonUniformMutationTest.testStep()");
@@ -131,6 +110,7 @@ public class MultiNonUniformMutationTest {
         vStep.print();
     }
     
+    @Ignore
     @Test
     public void sol() {
         System.out.println("org.gitia.tipo3.mutation.MultiNonUniformMutationTest.sol()");

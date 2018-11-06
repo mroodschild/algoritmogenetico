@@ -30,11 +30,12 @@ public class MultiNonUniformMutation {
     static Random r = new Random();
 
     /**
-     * 
-     * Esta funcion reemplaza en la lista de no cruzados a los idividuos selecionados,
-     * por el mutado, ademas los devuelve en un listado
-     * 
-     * @param population_nocruzada // poblacion que no participo en el cruzamiento
+     *
+     * Esta funcion reemplaza en la lista de no cruzados a los idividuos
+     * selecionados, por el mutado, ademas los devuelve en un listado
+     *
+     * @param population_nocruzada // poblacion que no participo en el
+     * cruzamiento
      * @param mutacion_size //cantidad de individuos a mutar
      * @param min // valor minimo del dna
      * @param max // valor maximo del dna
@@ -45,6 +46,7 @@ public class MultiNonUniformMutation {
     public static List<Individuo> mutacion(List<Individuo> population_nocruzada,
             int mutacion_size, double min, double max, int genAct, int getMax) {
 
+        //System.out.println("poblacion no cruzada:\t" + population_nocruzada.size());
         SimpleMatrix vdir = population_nocruzada.get(0).getDna().copy();
         SimpleMatrix vmax = population_nocruzada.get(0).getDna().copy();
         SimpleMatrix step = population_nocruzada.get(0).getDna().copy();
@@ -53,9 +55,9 @@ public class MultiNonUniformMutation {
         List<Individuo> aux = new ArrayList<>();
         for (int i = 0; i < mutacion_size; i++) {
             int idx = r.nextInt(population_nocruzada.size() - 1);
-            Individuo ind = new Individuo();
+            Individuo ind = population_nocruzada.get(idx);
             setDir(vdir);
-            setMaxChg(vmax, vdir, population_nocruzada.get(idx).getDna(), max, min);
+            setMaxChg(vmax, vdir, ind.getDna(), max, min);
             step(step, genAct, getMax);
             ind.setDna(sol(ind.getDna(), vdir, step, vmax));
             aux.add(ind);

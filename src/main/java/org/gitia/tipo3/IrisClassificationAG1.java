@@ -28,7 +28,7 @@ import org.gitia.tipo3.fitness.FitnessClassification;
  *
  * @author Matías Roodschild <mroodschild@gmail.com>
  */
-public class IrisClassification {
+public class IrisClassificationAG1 {
 
     public static void main(String[] args) {
 
@@ -51,7 +51,7 @@ public class IrisClassification {
         ((FitnessClassification) fitness).setOutput(out);
         ((FitnessClassification) fitness).setNet(net);
 
-        AG3 ag = new AG3(100, 50, net.getParameters().getNumElements(), 0.1, 0.02);
+        AG1 ag = new AG1(100, 100, net.getParameters().getNumElements(), 0.1, 0.02);
         ag.setFitness(fitness);
         ag.run();
     }

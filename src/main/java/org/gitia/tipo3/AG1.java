@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gitia.algoritmogenetico;
+package org.gitia.tipo3;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -91,8 +91,8 @@ public class AG1 {
         int offspring = (int) (populationSize - (numElite + numMutacion + numSeleccion));
         List<Individuo> listElite = new ArrayList<>();
         List<Individuo> listPoblacionSeleccionada = new ArrayList<>();
-        List<Individuo> listOffspring;
-        List<Individuo> listNoCruzada;
+        List<Individuo> listOffspring = new ArrayList<>();
+        List<Individuo> listNoCruzada = new ArrayList<>();
 
         population = Population.generate(populationSize, dnaSize, min, max);
         //iterations
