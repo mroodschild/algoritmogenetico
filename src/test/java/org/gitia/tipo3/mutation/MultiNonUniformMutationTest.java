@@ -56,21 +56,21 @@ public class MultiNonUniformMutationTest {
     /**
      * Test of mutacion method, of class MultiNonUniformMutation.
      */
-    @Ignore
-    @Test
-    public void testMutacion() {
-        System.out.println("mutacion");
-        List<Individuo> population = null;
-        double mutation = 0.0;
-        double elite = 0.0;
-        double max = 0.0;
-        double min = 0.0;
-        int genAct = 0;
-        int getMax = 0;
-        MultiNonUniformMutation.mutacion(population, mutation, elite, max, min, genAct, getMax);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+//    @Ignore
+//    @Test
+//    public void testMutacion() {
+//        System.out.println("mutacion");
+//        List<Individuo> population = null;
+//        double mutation = 0.0;
+//        double elite = 0.0;
+//        double max = 0.0;
+//        double min = 0.0;
+//        int genAct = 0;
+//        int getMax = 0;
+//        MultiNonUniformMutation.mutacion(population, mutation, elite, max, min, genAct, getMax);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
 
     @Test
     public void testSetDir() {

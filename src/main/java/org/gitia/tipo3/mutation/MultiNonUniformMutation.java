@@ -29,30 +29,39 @@ public class MultiNonUniformMutation {
 
     static Random r = new Random();
 
-    //public static void mutation(List<Individuo> population, SimpleMatrix bounds, double mutation, double elite, double min, double max) {
-    public static void mutacion(List<Individuo> population, 
-            double mutation, double elite, double max, double min, int genAct, int getMax) {
+    /**
+     * 
+     * Esta funcion reemplaza en la lista de no cruzados a los idividuos selecionados,
+     * por el mutado, ademas los devuelve en un listado
+     * 
+     * @param population_nocruzada // poblacion que no participo en el cruzamiento
+     * @param mutacion_size //cantidad de individuos a mutar
+     * @param min // valor minimo del dna
+     * @param max // valor maximo del dna
+     * @param genAct // epoca actual
+     * @param getMax // epoca total
+     * @return un listado con los idividuos mutados
+     */
+    public static List<Individuo> mutacion(List<Individuo> population_nocruzada,
+            int mutacion_size, double min, double max, int genAct, int getMax) {
 
-        SimpleMatrix vdir = population.get(0).getDna().copy();
-        SimpleMatrix vmax = population.get(0).getDna().copy();
-        SimpleMatrix step = population.get(0).getDna().copy();
+        SimpleMatrix vdir = population_nocruzada.get(0).getDna().copy();
+        SimpleMatrix vmax = population_nocruzada.get(0).getDna().copy();
+        SimpleMatrix step = population_nocruzada.get(0).getDna().copy();
         vdir.zero();
         setDir(vdir);
-        int eliteSize = (int) Math.round(population.size() * elite);
-        int size = (mutation > 0) ? population.size() - eliteSize : population.size();
         List<Individuo> aux = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            if (r.nextDouble() < mutation) {
-                Individuo ind = new Individuo();
-                setDir(vdir);
-                setMaxChg(vmax, vdir, population.get(i).getDna(), max, min);
-                step(step, genAct, getMax);
-                ind.setDna(sol(ind.getDna(), vdir, step, vmax));
-                aux.add(ind);
-            }else{
-                aux.add(population.get(i));
-            }
+        for (int i = 0; i < mutacion_size; i++) {
+            int idx = r.nextInt(population_nocruzada.size() - 1);
+            Individuo ind = new Individuo();
+            setDir(vdir);
+            setMaxChg(vmax, vdir, population_nocruzada.get(idx).getDna(), max, min);
+            step(step, genAct, getMax);
+            ind.setDna(sol(ind.getDna(), vdir, step, vmax));
+            aux.add(ind);
+            population_nocruzada.set(idx, ind);
         }
+        return aux;
     }
 
     /**

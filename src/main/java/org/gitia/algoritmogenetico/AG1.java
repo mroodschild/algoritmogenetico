@@ -16,16 +16,13 @@
 package org.gitia.algoritmogenetico;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
-import org.gitia.tipo3.crossover.Crossover;
 import org.gitia.tipo3.crossover.CubeCrossOver;
 import org.gitia.tipo3.fitness.Fitness;
 import org.gitia.tipo3.fitness.FitnessCuadratic;
 import org.gitia.tipo3.mutation.MultiNonUniformMutation;
-import org.gitia.tipo3.mutation.Mutation;
 import org.gitia.tipo3.population.Individuo;
 import org.gitia.tipo3.population.IndividuoComparator;
 import org.gitia.tipo3.population.Population;
@@ -36,7 +33,7 @@ import org.gitia.tipo3.population.Population;
  */
 public class AG1 {
 
-    int epoch;
+    int genMax;
     int populationSize;
     int dnaSize;
     double elite_porcentaje;
@@ -50,16 +47,34 @@ public class AG1 {
         this(50, 20, 10, 0.2, 0.2);
     }
 
+    /**
+     * 
+     * @param epoch cantidad de epocas
+     * @param populationSize tamaño de la población
+     * @param dnaSize tamaño del adn
+     * @param elite porcentaje de elite
+     * @param mutation porcentaje de mutación
+     */
     public AG1(int epoch, int populationSize, int dnaSize, double elite, double mutation) {
-        this.epoch = epoch;
+        this.genMax = epoch;
         this.populationSize = populationSize;
         this.elite_porcentaje = elite;
         this.dnaSize = dnaSize;
         this.mutation = mutation;
     }
 
+    /**
+     * 
+     * @param epoch cantidad de epocas
+     * @param populationSize tamaño de la población
+     * @param dnaSize tamaño del adn
+     * @param elite porcentaje de elite
+     * @param mutation porcentaje de mutación
+     * @param min valores minimos
+     * @param max valores maximos
+     */
     public AG1(int epoch, int populationSize, int dnaSize, double elite, double mutation, double min, double max) {
-        this.epoch = epoch;
+        this.genMax = epoch;
         this.populationSize = populationSize;
         this.dnaSize = dnaSize;
         this.elite_porcentaje = elite;
@@ -76,17 +91,15 @@ public class AG1 {
         int offspring = (int) (populationSize - (numElite + numMutacion + numSeleccion));
         List<Individuo> listElite = new ArrayList<>();
         List<Individuo> listPoblacionSeleccionada = new ArrayList<>();
-        List<Individuo> listOffspring = new ArrayList<>();
-        List<Individuo> listNoCruzada = new ArrayList<>();
-        List<Individuo> listMutación = new ArrayList<>();
-        List<Individuo> listSinParticipacion = new ArrayList<>();
+        List<Individuo> listOffspring;
+        List<Individuo> listNoCruzada;
 
         population = Population.generate(populationSize, dnaSize, min, max);
         //iterations
         fitness.fit(population);
         // separar la elite
 
-        for (int i = 0; i < epoch; i++) {
+        for (int genAct = 0; genAct < genMax; genAct++) {
             //fit y orden de menor a mayor
             Collections.sort(population, new IndividuoComparator());
             listElite.clear();
@@ -103,13 +116,15 @@ public class AG1 {
             //unimos el offspring, con los mutados, los seleccionados y la elite
             listOffspring = CubeCrossOver.crossover(population, paring);
             listNoCruzada = separarSeleccionNoCruzada(paring, population, numElite);
-            //offspring
+            MultiNonUniformMutation.mutacion(listNoCruzada, numMutacion, min, max, genAct, genMax);
 
-            //mutation
-            Mutation.mutation(population, mutation, elite_porcentaje, min, max);
-            //end?
+            //unimos las partes y reemplazamos por la nueva generación de individuos
+            population = joinListas(listOffspring, listNoCruzada, listElite);
+            cleanListas(listOffspring, listNoCruzada, listElite);
+            //evaluamos los individuos nuevamente
             fitness.fit(population);
-            fitness.printResume(population, i);
+            // mostramos los resultados
+            fitness.printResume(population, genAct);
         }
         //return solution
     }
@@ -135,6 +150,28 @@ public class AG1 {
         }
     }
 
+    /**
+     * unimos las partes y devolvemos la lista completa
+     * @param listOffspring
+     * @param listNoCruzada
+     * @param listElite
+     * @return 
+     */
+    private List<Individuo> joinListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite) {
+        List<Individuo> aux = new ArrayList<>();
+        aux.addAll(listOffspring);
+        aux.addAll(listNoCruzada);
+        aux.addAll(listElite);
+        return aux;
+    }
+    
+     private void cleanListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite) {
+        listElite.clear();
+        listNoCruzada.clear();
+        listOffspring.clear();
+    }
+
+
     private List<Individuo> separarSeleccionNoCruzada(int[][] paring, List<Individuo> population, int numElite) {
         List<Individuo> selNoCruzada = new ArrayList<>();
         int[] indicesCruzados = new int[paring.length * 2];
@@ -157,7 +194,7 @@ public class AG1 {
 
         // removemos los indices que ya fueron cruzados
         idxNoCruzados = ArrayUtils.removeElements(indicesPoblacion, indicesCruzados);
-        
+
         //generamos la lista de los no cruzados
         for (int i = 0; i < idxNoCruzados.length; i++) {
             selNoCruzada.add(new Individuo(population.get(idxNoCruzados[i]).getDna(), population.get(idxNoCruzados[i]).getFitness()));
@@ -186,7 +223,7 @@ public class AG1 {
     }
 
     public void setEpoch(int epoch) {
-        this.epoch = epoch;
+        this.genMax = epoch;
     }
 
     public void setMax(double max) {
@@ -208,5 +245,4 @@ public class AG1 {
     public void setDnaSize(int dnaSize) {
         this.dnaSize = dnaSize;
     }
-
 }
