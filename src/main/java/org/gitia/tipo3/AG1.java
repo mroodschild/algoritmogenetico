@@ -34,79 +34,82 @@ import org.gitia.tipo3.population.Population;
 public class AG1 {
 
     int genMax;
-    int populationSize;
+    int popSize;
     int dnaSize;
     double elite_porcentaje;
     double mutation;
     double min = -1;
     double max = 1;
+    int tournament_size;
     List<Individuo> population;
+    List<Individuo> listElite = new ArrayList<>();
+    List<Individuo> listPoblacionSeleccionada = new ArrayList<>();
+    List<Individuo> listOffspring;
+    List<Individuo> listNoCruzada;
     Fitness fitness = new FitnessCuadratic();
 
     public AG1() {
-        this(50, 20, 10, 0.2, 0.2);
+        this(50, 20, 10, 0.2, 0.2, 2);
     }
 
     /**
-     * 
+     *
      * @param epoch cantidad de epocas
      * @param populationSize tamaño de la población
      * @param dnaSize tamaño del adn
      * @param elite porcentaje de elite
      * @param mutation porcentaje de mutación
+     * @param tournament_size
      */
-    public AG1(int epoch, int populationSize, int dnaSize, double elite, double mutation) {
+    public AG1(int epoch, int populationSize, int dnaSize, double elite, double mutation, int tournament_size) {
         this.genMax = epoch;
-        this.populationSize = populationSize;
+        this.popSize = populationSize;
         this.elite_porcentaje = elite;
         this.dnaSize = dnaSize;
         this.mutation = mutation;
+        this.tournament_size = tournament_size;
     }
 
     /**
-     * 
+     *
      * @param epoch cantidad de epocas
      * @param populationSize tamaño de la población
      * @param dnaSize tamaño del adn
      * @param elite porcentaje de elite
      * @param mutation porcentaje de mutación
+     * @param tournament_size
      * @param min valores minimos
      * @param max valores maximos
      */
-    public AG1(int epoch, int populationSize, int dnaSize, double elite, double mutation, double min, double max) {
+    public AG1(int epoch, int populationSize, int dnaSize, double elite, double mutation, int tournament_size, double min, double max) {
         this.genMax = epoch;
-        this.populationSize = populationSize;
+        this.popSize = populationSize;
         this.dnaSize = dnaSize;
         this.elite_porcentaje = elite;
         this.mutation = mutation;
         this.min = min;
         this.max = max;
+        this.tournament_size = tournament_size;
     }
 
     public void run() {
         //initial population
-        int numElite = (int) (populationSize * elite_porcentaje);
-        int numMutacion = (int) (populationSize * mutation);
-        int numSeleccion = (int) (populationSize * 0.05);
-        int offspring = (int) (populationSize - (numElite + numMutacion + numSeleccion));
-        
-        List<Individuo> listElite = new ArrayList<>();
-        List<Individuo> listPoblacionSeleccionada = new ArrayList<>();
-        List<Individuo> listOffspring = new ArrayList<>();
-        List<Individuo> listNoCruzada = new ArrayList<>();
+        int numElite = (int) (popSize * elite_porcentaje);
+        int numMutacion = (int) (popSize * mutation);
+        int numSeleccion = (int) (popSize * 0.23);
+        int offspring = (int) (popSize * 0.6);
 
-        population = Population.generate(populationSize, dnaSize, min, max);
-        
-        System.out.println("elite porcentaje:\t"+elite_porcentaje+
-                "\tMutación\t"+mutation
-                );
-        System.out.println("Poblacion\t"+population.size()+"\telite\t"+numElite+
-                "\tnumMutacion\t"+numMutacion+
-                "\tnumSeleccion\t"+numSeleccion+
-                "\toffspring\t"+offspring
+        population = Population.generate(popSize, dnaSize, min, max);
+
+        System.out.println("elite porcentaje:\t" + elite_porcentaje
+                + "\tMutación\t" + mutation
         );
-        
-        
+        System.out.println("Poblacion\t" + population.size() + "\telite\t" + numElite
+                + "\tnumMutacion\t" + numMutacion
+                + "\tnumSeleccion\t" + numSeleccion
+                + "\toffspring\t" + offspring
+        );
+
         //iterations
         fitness.fit(population);
         // separar la elite
@@ -116,9 +119,20 @@ public class AG1 {
             Collections.sort(population, new IndividuoComparator());
             listElite.clear();
             separarElite(population, listElite, numElite, listPoblacionSeleccionada);
+            //System.out.println("Scores Población");
+            //print(population);
+            
+            //System.out.println("Scores Elite");
+            //print(listElite);
+            
             //elite
             //seleccionamos para hacer el cruzamiento
-            int[][] paring = Ruleta.getParing(offspring, population);
+            int[][] paring = Tournament.getParing(offspring, population,tournament_size);
+            //System.exit(0);
+            // 
+            //System.out.println("Pareo");
+            //print(paring);
+            //System.exit(0);
             //separarOffspringSelNoCruzada(paring, population, listPoblacionSeleccionada, listCrossOver, listNoCruzada);
             //realizamos el cruzamiento
             //guardamos el cruzamiento
@@ -131,6 +145,7 @@ public class AG1 {
             MultiNonUniformMutation.mutacion(listNoCruzada, numMutacion, min, max, genAct, genMax);
 
             //unimos las partes y reemplazamos por la nueva generación de individuos
+            population.clear();
             population = joinListas(listOffspring, listNoCruzada, listElite);
             cleanListas(listOffspring, listNoCruzada, listElite);
             //evaluamos los individuos nuevamente
@@ -151,8 +166,8 @@ public class AG1 {
     private void separarElite(List<Individuo> population,
             List<Individuo> listElite, int numElite,
             List<Individuo> poblacionSeleccionada) {
-        for (int i = populationSize - 1; i >= 0; i--) {
-            if (i >= (populationSize - numElite - 1)) {
+        for (int i = popSize - 1; i >= 0; i--) {
+            if (i >= (popSize - numElite - 1)) {
                 Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
                 listElite.add(ind);
             } else {
@@ -164,10 +179,11 @@ public class AG1 {
 
     /**
      * unimos las partes y devolvemos la lista completa
+     *
      * @param listOffspring
      * @param listNoCruzada
      * @param listElite
-     * @return 
+     * @return
      */
     private List<Individuo> joinListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite) {
         List<Individuo> aux = new ArrayList<>();
@@ -176,13 +192,12 @@ public class AG1 {
         aux.addAll(listElite);
         return aux;
     }
-    
-     private void cleanListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite) {
+
+    private void cleanListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite) {
         listElite.clear();
         listNoCruzada.clear();
         listOffspring.clear();
     }
-
 
     private List<Individuo> separarSeleccionNoCruzada(int[][] paring, List<Individuo> population, int numElite) {
         List<Individuo> selNoCruzada = new ArrayList<>();
@@ -247,7 +262,7 @@ public class AG1 {
     }
 
     public void setPopulationSize(int populationSize) {
-        this.populationSize = populationSize;
+        this.popSize = populationSize;
     }
 
     public void setPopulation(List<Individuo> population) {
@@ -256,5 +271,23 @@ public class AG1 {
 
     public void setDnaSize(int dnaSize) {
         this.dnaSize = dnaSize;
+    }
+
+    private void print(List<Individuo> population) {
+        for (int i = 0; i < population.size(); i++) {
+            System.out.println("score: "+population.get(i).getFitness());
+        }
+    }
+
+    private void print(int[][] paring) {
+        int i=0;
+        for (int[] is : paring) {
+            System.out.printf("%d: ",i++);
+            for (int j = 0; j < is.length; j++) {
+                int k = is[j];
+                System.out.printf("%d ",k);
+            }
+            System.out.printf("\n");
+        }
     }
 }

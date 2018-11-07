@@ -22,7 +22,7 @@ package org.gitia.tipo3;
 public class MainAG1 {
 
     public static void main(String[] args) {
-        AG1 ag = new AG1(100, 100, 4, 0.02, 0.05, -1, 1);
+        AG1 ag = new AG1(100, 100, 4, 0.02, 0.05,10, -1, 1);
         ag.run();
     }
 

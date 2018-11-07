@@ -66,6 +66,8 @@ class Ruleta {
             sum += (ind.getFitness() == 0) ? 0.1 : ind.getFitness();
             tabla_tickets.set(i, 1, sum);
         }
+        
+        //print(tabla_tickets, population);
         return tabla_tickets.divide(sum);
     }
 
@@ -87,6 +89,16 @@ class Ruleta {
             }
         }
         return idx;
+    }
+
+    private static void print(SimpleMatrix tabla_tickets, List<Individuo> population) {
+        System.out.println("org.gitia.tipo3.Ruleta.print(Tickets)");
+        for (int i = 0; i < population.size(); i++) {
+            Individuo ind = population.get(i);
+            double a = tabla_tickets.extractVector(true, i).get(0);
+            double b = tabla_tickets.extractVector(true, i).get(1);
+            System.out.println(a +"\t"+b+"\t"+ind.getFitness());
+        }
     }
 
 }

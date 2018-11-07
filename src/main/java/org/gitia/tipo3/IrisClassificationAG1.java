@@ -51,7 +51,7 @@ public class IrisClassificationAG1 {
         ((FitnessClassification) fitness).setOutput(out);
         ((FitnessClassification) fitness).setNet(net);
 
-        AG1 ag = new AG1(100, 100, net.getParameters().getNumElements(), 0.1, 0.02);
+        AG1 ag = new AG1(100, 100, net.getParameters().getNumElements(), 0.1, 0.02,10);
         ag.setFitness(fitness);
         ag.run();
     }
