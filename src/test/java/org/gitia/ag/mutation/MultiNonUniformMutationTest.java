@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gitia.tipo3.mutation;
+package org.gitia.ag.mutation;
 
+import org.gitia.ag.mutation.MultiNonUniformMutation;
 import org.ejml.simple.SimpleMatrix;
-import static org.gitia.tipo3.mutation.MultiNonUniformMutation.r;
+import static org.gitia.ag.mutation.MultiNonUniformMutation.r;
 import org.junit.Test;
 import org.junit.Ignore;
 

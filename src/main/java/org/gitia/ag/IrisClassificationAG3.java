@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gitia.tipo3;
+package org.gitia.ag;
 
 import org.ejml.simple.SimpleMatrix;
 import org.gitia.froog.Feedforward;
@@ -21,14 +21,14 @@ import org.gitia.froog.layer.Layer;
 import org.gitia.froog.transferfunction.TransferFunction;
 import org.gitia.jdataanalysis.CSV;
 import org.gitia.jdataanalysis.data.stats.STD;
-import org.gitia.tipo3.fitness.Fitness;
-import org.gitia.tipo3.fitness.FitnessClassification;
+import org.gitia.ag.fitness.Fitness;
+import org.gitia.ag.fitness.FitnessClassification;
 
 /**
  *
  * @author Matías Roodschild <mroodschild@gmail.com>
  */
-public class IrisClassificationAG1 {
+public class IrisClassificationAG3 {
 
     public static void main(String[] args) {
 
@@ -51,8 +51,7 @@ public class IrisClassificationAG1 {
         ((FitnessClassification) fitness).setOutput(out);
         ((FitnessClassification) fitness).setNet(net);
 
-        AG1 ag = new AG1(150, 100, net.getParameters().getNumElements(), 0.6, 0.02, 0.15, 2, -1, 1);
-        //AG1 ag = new AG1(100, 100, net.getParameters().getNumElements(), 0.6, 0.1, 0.02, 10);
+        AG3 ag = new AG3(100, 50, net.getParameters().getNumElements(), 0.1, 0.02);
         ag.setFitness(fitness);
         ag.run();
     }

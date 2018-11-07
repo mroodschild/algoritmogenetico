@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gitia.tipo3;
+package org.gitia.ag;
 
 import java.util.List;
 import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
-import org.gitia.tipo3.population.Individuo;
+import org.gitia.ag.population.Individuo;
 
 /**
  *

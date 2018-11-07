@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gitia.tipo3;
+package org.gitia.ag.fitness;
+
+import java.util.List;
+import org.gitia.ag.population.Individuo;
 
 /**
  *
  * @author Matías Roodschild <mroodschild@gmail.com>
  */
-public class MainAG1 {
+public interface Fitness {
 
-    public static void main(String[] args) {
-        AG1 ag = new AG1(100, 100, 4, 0.6, 0.02, 0.15, 10, -1, 1);
-        ag.run();
-    }
+    public void fit(List<Individuo> pop);
+
+    public void printResume(List<Individuo> population, int iteration);
 
 }

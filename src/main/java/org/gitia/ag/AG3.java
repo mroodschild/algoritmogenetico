@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gitia.tipo3;
+package org.gitia.ag;
 
 import java.util.List;
-import org.gitia.tipo3.crossover.Crossover;
-import org.gitia.tipo3.fitness.Fitness;
-import org.gitia.tipo3.fitness.FitnessCuadratic;
-import org.gitia.tipo3.mutation.Mutation;
-import org.gitia.tipo3.population.Individuo;
-import org.gitia.tipo3.population.Population;
+import org.gitia.ag.crossover.Crossover;
+import org.gitia.ag.fitness.Fitness;
+import org.gitia.ag.fitness.FitnessCuadratic;
+import org.gitia.ag.mutation.Mutation;
+import org.gitia.ag.population.Individuo;
+import org.gitia.ag.population.Population;
 
 /**
  *
