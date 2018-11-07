@@ -57,7 +57,7 @@ public class AG1 {
     protected int numSeleccion;
 
     public AG1() {
-        this(50, 20, 10, 0.6, 0.2, 0.2, 2);
+        //this(50, 20, 10, 0.6, 0.2, 0.2, 2);
     }
 
     /**
