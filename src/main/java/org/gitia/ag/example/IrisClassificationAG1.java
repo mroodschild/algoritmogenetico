@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gitia.ag;
+package org.gitia.ag.example;
 
 import org.ejml.simple.SimpleMatrix;
+import org.gitia.ag.AG1;
 import org.gitia.froog.Feedforward;
 import org.gitia.froog.layer.Layer;
 import org.gitia.froog.transferfunction.TransferFunction;

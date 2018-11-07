@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gitia.ag;
+package org.gitia.ag.example;
+
+import org.gitia.ag.AG1;
 
 /**
  *

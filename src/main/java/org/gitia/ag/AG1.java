@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import org.apache.commons.lang3.ArrayUtils;
+import org.gitia.ag.compite.Tournament;
 import org.gitia.ag.crossover.CubeCrossOver;
 import org.gitia.ag.fitness.Fitness;
 import org.gitia.ag.fitness.FitnessCuadratic;
@@ -61,6 +62,7 @@ public class AG1 {
      * @param epoch cantidad de epocas
      * @param populationSize tamaño de la población
      * @param dnaSize tamaño del adn
+     * @param offspring
      * @param elite porcentaje de elite
      * @param mutation porcentaje de mutación
      * @param tournament_size
@@ -80,6 +82,7 @@ public class AG1 {
      * @param epoch cantidad de epocas
      * @param populationSize tamaño de la población
      * @param dnaSize tamaño del adn
+     * @param offspring
      * @param elite porcentaje de elite
      * @param mutation porcentaje de mutación
      * @param tournament_size

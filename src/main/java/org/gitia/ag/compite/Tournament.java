@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gitia.ag;
+package org.gitia.ag.compite;
 
 import java.util.List;
 import java.util.Random;
@@ -23,7 +23,7 @@ import org.gitia.ag.population.Individuo;
  *
  * @author Matías Roodschild <mroodschild@gmail.com>
  */
-class Tournament {
+public class Tournament {
 
     static Random r = new Random();
 
@@ -33,7 +33,7 @@ class Tournament {
      * @param population para poder seleccionar la elite en el cruzamiento
      * @return los indices de p1 y p2
      */
-    static int[][] getParing(int offspring, List<Individuo> population, int size) {
+    public static int[][] getParing(int offspring, List<Individuo> population, int size) {
         int cant = (int) (offspring / 2); // porque salen dos hijos cada dos padres
         int[][] indices = new int[cant][2];
         int p1, p2;
