@@ -16,8 +16,10 @@
 package org.gitia.tipo3;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import org.apache.commons.lang3.ArrayUtils;
 import org.gitia.tipo3.crossover.CubeCrossOver;
 import org.gitia.tipo3.fitness.Fitness;
@@ -37,6 +39,7 @@ public class AG1 {
     int popSize;
     int dnaSize;
     double elite_porcentaje;
+    double offspring_porcentaje;
     double mutation;
     double min = -1;
     double max = 1;
@@ -47,9 +50,10 @@ public class AG1 {
     List<Individuo> listOffspring;
     List<Individuo> listNoCruzada;
     Fitness fitness = new FitnessCuadratic();
+    Random r = new Random();
 
     public AG1() {
-        this(50, 20, 10, 0.2, 0.2, 2);
+        this(50, 20, 10, 0.6, 0.2, 0.2, 2);
     }
 
     /**
@@ -61,13 +65,14 @@ public class AG1 {
      * @param mutation porcentaje de mutación
      * @param tournament_size
      */
-    public AG1(int epoch, int populationSize, int dnaSize, double elite, double mutation, int tournament_size) {
+    public AG1(int epoch, int populationSize, int dnaSize, double offspring, double elite, double mutation, int tournament_size) {
         this.genMax = epoch;
         this.popSize = populationSize;
         this.elite_porcentaje = elite;
         this.dnaSize = dnaSize;
         this.mutation = mutation;
         this.tournament_size = tournament_size;
+        this.offspring_porcentaje = offspring;
     }
 
     /**
@@ -81,7 +86,7 @@ public class AG1 {
      * @param min valores minimos
      * @param max valores maximos
      */
-    public AG1(int epoch, int populationSize, int dnaSize, double elite, double mutation, int tournament_size, double min, double max) {
+    public AG1(int epoch, int populationSize, int dnaSize, double offspring, double elite, double mutation, int tournament_size, double min, double max) {
         this.genMax = epoch;
         this.popSize = populationSize;
         this.dnaSize = dnaSize;
@@ -90,14 +95,15 @@ public class AG1 {
         this.min = min;
         this.max = max;
         this.tournament_size = tournament_size;
+        this.offspring_porcentaje = offspring;
     }
 
     public void run() {
         //initial population
         int numElite = (int) (popSize * elite_porcentaje);
         int numMutacion = (int) (popSize * mutation);
-        int numSeleccion = (int) (popSize * 0.23);
-        int offspring = (int) (popSize * 0.6);
+        int offspring = (int) (popSize * offspring_porcentaje);
+        int numSeleccion = popSize - (numElite + numMutacion + offspring);
 
         population = Population.generate(popSize, dnaSize, min, max);
 
@@ -121,13 +127,13 @@ public class AG1 {
             separarElite(population, listElite, numElite, listPoblacionSeleccionada);
             //System.out.println("Scores Población");
             //print(population);
-            
+
             //System.out.println("Scores Elite");
             //print(listElite);
-            
             //elite
             //seleccionamos para hacer el cruzamiento
-            int[][] paring = Tournament.getParing(offspring, population,tournament_size);
+            int[][] paring = Tournament.getParing(offspring, population, tournament_size);
+            //System.out.println("paring\t"+paring.length+" "+ paring[0].length);
             //System.exit(0);
             // 
             //System.out.println("Pareo");
@@ -141,10 +147,17 @@ public class AG1 {
             //mutamos y dejamos pasar a los que no se mutan
             //unimos el offspring, con los mutados, los seleccionados y la elite
             listOffspring = CubeCrossOver.crossover(population, paring);
-            listNoCruzada = separarSeleccionNoCruzada(paring, population, numElite);
+            // a la poblacion le quitamos la elite, quitamos los que se cruzaron
+            // y indicamos cuantos deben pasar (num Seleccion + num mutacion)
+            listNoCruzada = separarSeleccionNoCruzada(paring, population, numElite, numSeleccion + numMutacion);
             MultiNonUniformMutation.mutacion(listNoCruzada, numMutacion, min, max, genAct, genMax);
 
             //unimos las partes y reemplazamos por la nueva generación de individuos
+//            System.out.println("Poblacion\t" + population.size() + "\tList elite\t" + listElite.size()
+//                    + "\tList No Cruzada\t" + listNoCruzada.size()
+//                    + "\tList offspring\t" + listOffspring.size()
+//            );
+//            System.exit(0);
             population.clear();
             population = joinListas(listOffspring, listNoCruzada, listElite);
             cleanListas(listOffspring, listNoCruzada, listElite);
@@ -167,7 +180,7 @@ public class AG1 {
             List<Individuo> listElite, int numElite,
             List<Individuo> poblacionSeleccionada) {
         for (int i = popSize - 1; i >= 0; i--) {
-            if (i >= (popSize - numElite - 1)) {
+            if (i >= (popSize - numElite)) {
                 Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
                 listElite.add(ind);
             } else {
@@ -199,8 +212,9 @@ public class AG1 {
         listOffspring.clear();
     }
 
-    private List<Individuo> separarSeleccionNoCruzada(int[][] paring, List<Individuo> population, int numElite) {
+    private List<Individuo> separarSeleccionNoCruzada(int[][] paring, List<Individuo> population, int numElite, int sobreviven) {
         List<Individuo> selNoCruzada = new ArrayList<>();
+        List<Individuo> sobrevivientes = new ArrayList<>();
         int[] indicesCruzados = new int[paring.length * 2];
         int[] indicesPoblacion = new int[population.size()];
         int[] idxNoCruzados;
@@ -226,7 +240,20 @@ public class AG1 {
         for (int i = 0; i < idxNoCruzados.length; i++) {
             selNoCruzada.add(new Individuo(population.get(idxNoCruzados[i]).getDna(), population.get(idxNoCruzados[i]).getFitness()));
         }
-        return selNoCruzada;
+        //seleccionamos los sobrevivientes
+        int[] idxSobreviven = new int[sobreviven];
+        for (int i = 0; i < sobreviven; i++) {
+            int idx = r.nextInt(selNoCruzada.size());
+            while (ArrayUtils.contains(idxSobreviven, idx)) {
+                idx = r.nextInt(selNoCruzada.size());
+            }
+            idxSobreviven[i] = idx;
+        }
+        //capturamos a los sobrevivientes
+        for (int i = 0; i < idxSobreviven.length; i++) {
+            sobrevivientes.add(selNoCruzada.get(idxSobreviven[i]));
+        }
+        return sobrevivientes;
     }
 
     public void setElite(double elite) {
@@ -275,17 +302,17 @@ public class AG1 {
 
     private void print(List<Individuo> population) {
         for (int i = 0; i < population.size(); i++) {
-            System.out.println("score: "+population.get(i).getFitness());
+            System.out.println("score: " + population.get(i).getFitness());
         }
     }
 
     private void print(int[][] paring) {
-        int i=0;
+        int i = 0;
         for (int[] is : paring) {
-            System.out.printf("%d: ",i++);
+            System.out.printf("%d: ", i++);
             for (int j = 0; j < is.length; j++) {
                 int k = is[j];
-                System.out.printf("%d ",k);
+                System.out.printf("%d ", k);
             }
             System.out.printf("\n");
         }
