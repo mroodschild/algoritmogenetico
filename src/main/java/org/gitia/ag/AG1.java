@@ -16,7 +16,6 @@
 package org.gitia.ag;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -36,22 +35,26 @@ import org.gitia.ag.population.Population;
  */
 public class AG1 {
 
-    int genMax;
-    int popSize;
-    int dnaSize;
-    double elite_porcentaje;
-    double offspring_porcentaje;
-    double mutation;
-    double min = -1;
-    double max = 1;
-    int tournament_size;
-    List<Individuo> population;
-    List<Individuo> listElite = new ArrayList<>();
-    List<Individuo> listPoblacionSeleccionada = new ArrayList<>();
-    List<Individuo> listOffspring;
-    List<Individuo> listNoCruzada;
-    Fitness fitness = new FitnessCuadratic();
-    Random r = new Random();
+    protected int genMax;
+    protected int popSize;
+    protected int dnaSize;
+    protected double elite_porcentaje;
+    protected double offspring_porcentaje;
+    protected double mutation;
+    protected double min = -1;
+    protected double max = 1;
+    protected int tournament_size;
+    protected List<Individuo> population;
+    protected List<Individuo> listElite = new ArrayList<>();
+    protected List<Individuo> listPoblacionSeleccionada = new ArrayList<>();
+    protected List<Individuo> listOffspring;
+    protected List<Individuo> listNoCruzada;
+    protected Fitness fitness = new FitnessCuadratic();
+    protected Random r = new Random();
+    protected int numElite;
+    protected int numMutacion;
+    protected int numOffspring;
+    protected int numSeleccion;
 
     public AG1() {
         this(50, 20, 10, 0.6, 0.2, 0.2, 2);
@@ -62,19 +65,13 @@ public class AG1 {
      * @param epoch cantidad de epocas
      * @param populationSize tamaño de la población
      * @param dnaSize tamaño del adn
-     * @param offspring
+     * @param offspring porcentaje de numOffspring
      * @param elite porcentaje de elite
      * @param mutation porcentaje de mutación
-     * @param tournament_size
+     * @param tournament_size tamaño del torneo (no mayor al diez por ciento) en cantidad
      */
     public AG1(int epoch, int populationSize, int dnaSize, double offspring, double elite, double mutation, int tournament_size) {
-        this.genMax = epoch;
-        this.popSize = populationSize;
-        this.elite_porcentaje = elite;
-        this.dnaSize = dnaSize;
-        this.mutation = mutation;
-        this.tournament_size = tournament_size;
-        this.offspring_porcentaje = offspring;
+        this(epoch, populationSize, dnaSize, offspring, elite, mutation, tournament_size, -1, 1);
     }
 
     /**
@@ -82,10 +79,10 @@ public class AG1 {
      * @param epoch cantidad de epocas
      * @param populationSize tamaño de la población
      * @param dnaSize tamaño del adn
-     * @param offspring
+     * @param offspring porcentaje de numOffspring
      * @param elite porcentaje de elite
      * @param mutation porcentaje de mutación
-     * @param tournament_size
+     * @param tournament_size tamaño del torneo (no mayor al diez por ciento) en cantidad
      * @param min valores minimos
      * @param max valores maximos
      */
@@ -99,25 +96,24 @@ public class AG1 {
         this.max = max;
         this.tournament_size = tournament_size;
         this.offspring_porcentaje = offspring;
-    }
-
-    public void run() {
         //initial population
-        int numElite = (int) (popSize * elite_porcentaje);
-        int numMutacion = (int) (popSize * mutation);
-        int offspring = (int) (popSize * offspring_porcentaje);
-        int numSeleccion = popSize - (numElite + numMutacion + offspring);
-
+        numElite = (int) (popSize * elite_porcentaje);
+        numMutacion = (int) (popSize * mutation);
+        numOffspring = (int) (popSize * offspring_porcentaje);
+        numSeleccion = popSize - (numElite + numMutacion + numOffspring);
         population = Population.generate(popSize, dnaSize, min, max);
 
         System.out.println("elite porcentaje:\t" + elite_porcentaje
-                + "\tMutación\t" + mutation
+                + "\tmutación porcentaje\t" + mutation
         );
         System.out.println("Poblacion\t" + population.size() + "\telite\t" + numElite
                 + "\tnumMutacion\t" + numMutacion
                 + "\tnumSeleccion\t" + numSeleccion
-                + "\toffspring\t" + offspring
+                + "\tnumOffspring\t" + numOffspring
         );
+    }
+
+    public void run() {
 
         //iterations
         fitness.fit(population);
@@ -128,27 +124,16 @@ public class AG1 {
             Collections.sort(population, new IndividuoComparator());
             listElite.clear();
             separarElite(population, listElite, numElite, listPoblacionSeleccionada);
-            //System.out.println("Scores Población");
-            //print(population);
-
-            //System.out.println("Scores Elite");
-            //print(listElite);
             //elite
             //seleccionamos para hacer el cruzamiento
-            int[][] paring = Tournament.getParing(offspring, population, tournament_size);
-            //System.out.println("paring\t"+paring.length+" "+ paring[0].length);
-            //System.exit(0);
-            // 
-            //System.out.println("Pareo");
-            //print(paring);
-            //System.exit(0);
+            int[][] paring = Tournament.getParing(numOffspring, population, tournament_size);
             //separarOffspringSelNoCruzada(paring, population, listPoblacionSeleccionada, listCrossOver, listNoCruzada);
             //realizamos el cruzamiento
             //guardamos el cruzamiento
             //de la parte que no se cruzará
             //seleccionamos al azar los que se mutarán
             //mutamos y dejamos pasar a los que no se mutan
-            //unimos el offspring, con los mutados, los seleccionados y la elite
+            //unimos el numOffspring, con los mutados, los seleccionados y la elite
             listOffspring = CubeCrossOver.crossover(population, paring);
             // a la poblacion le quitamos la elite, quitamos los que se cruzaron
             // y indicamos cuantos deben pasar (num Seleccion + num mutacion)
@@ -156,11 +141,6 @@ public class AG1 {
             MultiNonUniformMutation.mutacion(listNoCruzada, numMutacion, min, max, genAct, genMax);
 
             //unimos las partes y reemplazamos por la nueva generación de individuos
-//            System.out.println("Poblacion\t" + population.size() + "\tList elite\t" + listElite.size()
-//                    + "\tList No Cruzada\t" + listNoCruzada.size()
-//                    + "\tList offspring\t" + listOffspring.size()
-//            );
-//            System.exit(0);
             population.clear();
             population = joinListas(listOffspring, listNoCruzada, listElite);
             cleanListas(listOffspring, listNoCruzada, listElite);
@@ -179,7 +159,7 @@ public class AG1 {
      * @param numElite cantidad de individuos a guardar
      * @param poblacionSeleccionada poblacion para el resto de las operaciones
      */
-    private void separarElite(List<Individuo> population,
+    protected void separarElite(List<Individuo> population,
             List<Individuo> listElite, int numElite,
             List<Individuo> poblacionSeleccionada) {
         for (int i = popSize - 1; i >= 0; i--) {
@@ -201,7 +181,7 @@ public class AG1 {
      * @param listElite
      * @return
      */
-    private List<Individuo> joinListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite) {
+    protected List<Individuo> joinListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite) {
         List<Individuo> aux = new ArrayList<>();
         aux.addAll(listOffspring);
         aux.addAll(listNoCruzada);
@@ -209,13 +189,13 @@ public class AG1 {
         return aux;
     }
 
-    private void cleanListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite) {
+    protected void cleanListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite) {
         listElite.clear();
         listNoCruzada.clear();
         listOffspring.clear();
     }
 
-    private List<Individuo> separarSeleccionNoCruzada(int[][] paring, List<Individuo> population, int numElite, int sobreviven) {
+    protected List<Individuo> separarSeleccionNoCruzada(int[][] paring, List<Individuo> population, int numElite, int sobreviven) {
         List<Individuo> selNoCruzada = new ArrayList<>();
         List<Individuo> sobrevivientes = new ArrayList<>();
         int[] indicesCruzados = new int[paring.length * 2];
@@ -257,6 +237,18 @@ public class AG1 {
             sobrevivientes.add(selNoCruzada.get(idxSobreviven[i]));
         }
         return sobrevivientes;
+    }
+    
+    protected void print(int[][] paring) {
+        int i = 0;
+        for (int[] is : paring) {
+            System.out.printf("%d: ", i++);
+            for (int j = 0; j < is.length; j++) {
+                int k = is[j];
+                System.out.printf("%d ", k);
+            }
+            System.out.printf("\n");
+        }
     }
 
     public void setElite(double elite) {
@@ -306,18 +298,6 @@ public class AG1 {
     private void print(List<Individuo> population) {
         for (int i = 0; i < population.size(); i++) {
             System.out.println("score: " + population.get(i).getFitness());
-        }
-    }
-
-    private void print(int[][] paring) {
-        int i = 0;
-        for (int[] is : paring) {
-            System.out.printf("%d: ", i++);
-            for (int j = 0; j < is.length; j++) {
-                int k = is[j];
-                System.out.printf("%d ", k);
-            }
-            System.out.printf("\n");
         }
     }
 }
