@@ -41,6 +41,10 @@ public class Individuo {
     public void setFitness(double fitness) {
         this.fitness = fitness;
     }
+    
+    public void addFitness(double fitness){
+        this.fitness += fitness;
+    }
 
     public SimpleMatrix getDna() {
         return dna;
