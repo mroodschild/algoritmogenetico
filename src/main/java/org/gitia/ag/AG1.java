@@ -143,7 +143,7 @@ public class AG1 {
             //unimos las partes y reemplazamos por la nueva generación de individuos
             population.clear();
             population = joinListas(listOffspring, listNoCruzada, listElite);
-            cleanListas(listOffspring, listNoCruzada, listElite);
+            cleanListas(listOffspring, listNoCruzada, listElite, listPoblacionSeleccionada);
             //evaluamos los individuos nuevamente
             fitness.fit(population);
             // mostramos los resultados
@@ -189,10 +189,11 @@ public class AG1 {
         return aux;
     }
 
-    protected void cleanListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite) {
+    protected void cleanListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite, List<Individuo> listPoblacionSeleccionada) {
         listElite.clear();
         listNoCruzada.clear();
         listOffspring.clear();
+        listPoblacionSeleccionada.clear();
     }
 
     protected List<Individuo> separarSeleccionNoCruzada(int[][] paring, List<Individuo> population, int numElite, int sobreviven) {
