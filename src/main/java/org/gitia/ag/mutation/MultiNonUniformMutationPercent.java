@@ -27,6 +27,8 @@ import org.gitia.ag.population.Individuo;
  */
 public class MultiNonUniformMutationPercent {
 
+    static double porcentaje = 0.05;
+
     static Random r = new Random();
 
     /**
@@ -53,7 +55,7 @@ public class MultiNonUniformMutationPercent {
         SimpleMatrix vPorcentaje = population_nocruzada.get(0).getDna().copy();
         vdir.zero();
         vPorcentaje.zero();
-        setPorcentaje(vPorcentaje, 0.05);
+        setPorcentaje(vPorcentaje, porcentaje);
         setDir(vdir);
         List<Individuo> aux = new ArrayList<>();
         for (int i = 0; i < mutacion_size; i++) {
@@ -89,7 +91,7 @@ public class MultiNonUniformMutationPercent {
      * @param max
      * @param min
      */
-    static public void setMaxChg(SimpleMatrix vMaxChg, SimpleMatrix dir, 
+    static public void setMaxChg(SimpleMatrix vMaxChg, SimpleMatrix dir,
             SimpleMatrix ind, double min, double max) {
         for (int i = 0; i < vMaxChg.getNumElements(); i++) {
             if (dir.get(i) == 1) {
@@ -115,11 +117,10 @@ public class MultiNonUniformMutationPercent {
 
     private static void setPorcentaje(SimpleMatrix vPorcentaje, double d) {
         for (int i = 0; i < vPorcentaje.getNumElements(); i++) {
-            if(r.nextDouble()<d){
+            if (r.nextDouble() < d) {
                 vPorcentaje.set(i, 1);
             }
         }
     }
 
-    
 }
