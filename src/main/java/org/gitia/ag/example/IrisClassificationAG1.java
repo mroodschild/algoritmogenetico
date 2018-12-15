@@ -18,12 +18,12 @@ package org.gitia.ag.example;
 import org.ejml.simple.SimpleMatrix;
 import org.gitia.ag.AG1;
 import org.gitia.froog.Feedforward;
-import org.gitia.froog.layer.Layer;
 import org.gitia.froog.transferfunction.TransferFunction;
 import org.gitia.jdataanalysis.CSV;
 import org.gitia.jdataanalysis.data.stats.STD;
 import org.gitia.ag.fitness.Fitness;
 import org.gitia.ag.fitness.FitnessClassification;
+import org.gitia.froog.layer.Dense;
 
 /**
  *
@@ -44,8 +44,8 @@ public class IrisClassificationAG1 {
         out = out.transpose();
 
         Feedforward net = new Feedforward();
-        net.addLayer(new Layer(4, 5, TransferFunction.TANSIG));
-        net.addLayer(new Layer(5, 3, TransferFunction.SOFTMAX));
+        net.addLayer(new Dense(4, 5, TransferFunction.TANSIG));
+        net.addLayer(new Dense(5, 3, TransferFunction.SOFTMAX));
 
         Fitness fitness = new FitnessClassification();
         ((FitnessClassification) fitness).setInput(in);

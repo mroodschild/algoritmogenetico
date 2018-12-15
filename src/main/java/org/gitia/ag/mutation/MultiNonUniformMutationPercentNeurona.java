@@ -43,15 +43,16 @@ public class MultiNonUniformMutationPercentNeurona {
      * @param val_max // valor maximo del dna
      * @param genAct // epoca actual
      * @param getMax // epoca total
-     * @param first_gen posición inicial de la mutación
-     * @param last_gen posición final de la mutación
+     * @param neuronasCapas cantidad de neuronas que tiene determinada capa
+     * @param pesosNeuronaCapa cantidad de pesos que tiene una neurona en
+     * determinada capa
      * @return un listado con los idividuos mutados
      */
     public static List<Individuo> mutacion(List<Individuo> population_nocruzada,
             int mutacion_size, double val_min, double val_max, int genAct, int getMax,
-            int first_gen, int last_gen
-            ) {
-
+            int[] neuronasCapas, int[] pesosNeuronaCapa, double porcentajeMutacion
+    ) {
+        porcentaje = porcentajeMutacion;
         //System.out.println("poblacion no cruzada:\t" + population_nocruzada.size());
         SimpleMatrix vdir = population_nocruzada.get(0).getDna().copy();
         SimpleMatrix vmax = population_nocruzada.get(0).getDna().copy();
@@ -59,7 +60,7 @@ public class MultiNonUniformMutationPercentNeurona {
         SimpleMatrix vPorcentaje = population_nocruzada.get(0).getDna().copy();
         vdir.zero();
         vPorcentaje.zero();
-        setPorcentaje(vPorcentaje, porcentaje, first_gen, last_gen);
+        setPorcentaje(vPorcentaje, porcentaje, neuronasCapas, pesosNeuronaCapa);
         setDir(vdir);
         List<Individuo> aux = new ArrayList<>();
         for (int i = 0; i < mutacion_size; i++) {
@@ -74,15 +75,46 @@ public class MultiNonUniformMutationPercentNeurona {
         }
         return aux;
     }
-    
+
     /**
-     * 
+     *
      * @param vPorcentaje vector mascara para guardar los genes a mutar
      * @param porcentajeMutacion
      * @param first_gen posición inicial de la mutación
      * @param last_gen posición final de la mutación
      */
-    private static void setPorcentaje(SimpleMatrix vPorcentaje, double porcentajeMutacion, int first_gen, int last_gen) {
+    private static void setPorcentaje(
+            SimpleMatrix vPorcentaje, double porcentajeMutacion,
+            int[] neuronasCapas, int[] pesosNeuronaCapa) {
+        int neuronas = neuronasCapas[0];// solo capa oculta
+        int pesos = pesosNeuronaCapa[0];
+        int neuronaSeleccionada = r.nextInt(neuronas);
+        int first_gen = neuronaSeleccionada * pesos;
+        int last_gen = first_gen + pesos;
+        for (int i = first_gen; i < last_gen; i++) {
+            if (r.nextDouble() < porcentajeMutacion) {
+                vPorcentaje.set(i, 1);
+            }
+        }
+    }
+
+    private static void setPorcentajeLastLayer(
+            SimpleMatrix vPorcentaje, double porcentajeMutacion,
+            int[] neuronasCapas, int[] pesosNeuronaCapa, double desviacion) {
+
+        int L = neuronasCapas.length;//capas
+        //int cantidadNeuronasCapasAnteriores = 0;
+        int cantidadPesosCapasAnteriores = 0;
+        //neuronas antes de la capa de salida
+        for (int i = 0; i < L - 1; i++) {
+            //cantidadNeuronasCapasAnteriores += neuronasCapas[i];
+            cantidadPesosCapasAnteriores += neuronasCapas[i]*pesosNeuronaCapa[i];
+        }
+        int neuronas = neuronasCapas[L - 1];// neuronas capa de salida
+        int pesos = pesosNeuronaCapa[L - 1];// Pesos por neurona capa salida
+        int neuronaSeleccionada = r.nextInt(neuronas);//seleccionada de la ultima capa
+        int first_gen = neuronaSeleccionada * pesos + cantidadPesosCapasAnteriores;//posiciones para la ultima capa
+        int last_gen = first_gen + pesos;//ultimo peso
         for (int i = first_gen; i < last_gen; i++) {
             if (r.nextDouble() < porcentajeMutacion) {
                 vPorcentaje.set(i, 1);
