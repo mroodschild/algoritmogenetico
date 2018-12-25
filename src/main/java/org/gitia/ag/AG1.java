@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.gitia.ag.compite.Tournament;
 import org.gitia.ag.crossover.CubeCrossOver;
@@ -68,7 +69,8 @@ public class AG1 {
      * @param offspring porcentaje de numOffspring
      * @param elite porcentaje de elite
      * @param mutation porcentaje de mutación
-     * @param tournament_size tamaño del torneo (no mayor al diez por ciento) en cantidad
+     * @param tournament_size tamaño del torneo (no mayor al diez por ciento) en
+     * cantidad
      */
     public AG1(int epoch, int populationSize, int dnaSize, double offspring, double elite, double mutation, int tournament_size) {
         this(epoch, populationSize, dnaSize, offspring, elite, mutation, tournament_size, -1, 1);
@@ -82,7 +84,8 @@ public class AG1 {
      * @param offspring porcentaje de numOffspring
      * @param elite porcentaje de elite
      * @param mutation porcentaje de mutación
-     * @param tournament_size tamaño del torneo (no mayor al diez por ciento) en cantidad
+     * @param tournament_size tamaño del torneo (no mayor al diez por ciento) en
+     * cantidad
      * @param min valores minimos
      * @param max valores maximos
      */
@@ -121,12 +124,12 @@ public class AG1 {
 
         for (int genAct = 0; genAct < genMax; genAct++) {
             //fit y orden de menor a mayor
-            Collections.sort(population, new IndividuoComparator());
+            Collections.sort(population, new IndividuoComparator());//ok
             listElite.clear();
-            separarElite(population, listElite, numElite, listPoblacionSeleccionada);
+            separarElite(population, listElite, numElite, listPoblacionSeleccionada);//ok
             //elite
             //seleccionamos para hacer el cruzamiento
-            int[][] paring = Tournament.getParing(numOffspring, population, tournament_size);
+            int[][] paring = Tournament.getParing(numOffspring, population, tournament_size);//ok
             //separarOffspringSelNoCruzada(paring, population, listPoblacionSeleccionada, listCrossOver, listNoCruzada);
             //realizamos el cruzamiento
             //guardamos el cruzamiento
@@ -134,10 +137,10 @@ public class AG1 {
             //seleccionamos al azar los que se mutarán
             //mutamos y dejamos pasar a los que no se mutan
             //unimos el numOffspring, con los mutados, los seleccionados y la elite
-            listOffspring = CubeCrossOver.crossover(population, paring);
+            listOffspring = CubeCrossOver.crossover(population, paring);//ok
             // a la poblacion le quitamos la elite, quitamos los que se cruzaron
             // y indicamos cuantos deben pasar (num Seleccion + num mutacion)
-            listNoCruzada = separarSeleccionNoCruzada(paring, population, numElite, numSeleccion + numMutacion);
+            listNoCruzada = separarSeleccionNoCruzada(paring, population, numElite, (popSize - (listOffspring.size() + numElite)));//revisar
             MultiNonUniformMutation.mutacion(listNoCruzada, numMutacion, min, max, genAct, genMax);
 
             //unimos las partes y reemplazamos por la nueva generación de individuos
@@ -165,9 +168,11 @@ public class AG1 {
         for (int i = popSize - 1; i >= 0; i--) {
             if (i >= (popSize - numElite)) {
                 Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
+                //System.out.println("Elite: " + i + "\tscore: " + ind.getFitness());
                 listElite.add(ind);
             } else {
                 Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
+                //System.out.println("Normal: " + i + "\tscore: " + ind.getFitness());
                 poblacionSeleccionada.add(ind);
             }
         }
@@ -175,6 +180,7 @@ public class AG1 {
 
     /**
      * unimos las partes y devolvemos la lista completa
+     * primero los offspring, luego los no cruzados y por ultimo la elite
      *
      * @param listOffspring
      * @param listNoCruzada
@@ -183,6 +189,8 @@ public class AG1 {
      */
     protected List<Individuo> joinListas(List<Individuo> listOffspring, List<Individuo> listNoCruzada, List<Individuo> listElite) {
         List<Individuo> aux = new ArrayList<>();
+        
+        System.out.println("lisOffspring:\t"+listOffspring.size()+"\tlistNoCruzada:\t"+listNoCruzada.size()+"\tlistElite:\t"+listElite.size());
         aux.addAll(listOffspring);
         aux.addAll(listNoCruzada);
         aux.addAll(listElite);
@@ -196,6 +204,14 @@ public class AG1 {
         listPoblacionSeleccionada.clear();
     }
 
+    /**
+     *
+     * @param paring individuos seleccionados para cruzamiento
+     * @param population todos los individuos
+     * @param numElite individuos seleccionados en elite
+     * @param sobreviven cuantos deben sobrevivir
+     * @return listado de individuos que no se cruzaron
+     */
     protected List<Individuo> separarSeleccionNoCruzada(int[][] paring, List<Individuo> population, int numElite, int sobreviven) {
         List<Individuo> selNoCruzada = new ArrayList<>();
         List<Individuo> sobrevivientes = new ArrayList<>();
@@ -203,27 +219,45 @@ public class AG1 {
         int[] indicesPoblacion = new int[population.size()];
         int[] idxNoCruzados;
         int k = 0;
+        System.out.println("============= Seleccion no cruzada ==============");
         //ponemos los padres en un listado
         for (int[] paring1 : paring) {
             for (int j = 0; j < paring[0].length; j++) {
                 indicesCruzados[k++] = paring1[j];
             }
         }
+
+        System.out.println("pareo");
+        printVector(indicesCruzados);
+
         //quitamos los padres repetidos
-        indicesCruzados = java.util.stream.IntStream.of(indicesCruzados).distinct().toArray();
+        indicesCruzados = IntStream.of(indicesCruzados).distinct().toArray();
+
+        System.out.println("sin duplicados");
+        printVector(indicesCruzados);
 
         //creamos los indices de la población
         for (int i = 0; i < population.size(); i++) {
             indicesPoblacion[i] = i;
         }
 
+        System.out.println("Poblacion");
+        printVector(indicesPoblacion);
+        
+        System.out.println("Poblacion Score");
+        printPoblacion(population);
+
         // removemos los indices que ya fueron cruzados
         idxNoCruzados = ArrayUtils.removeElements(indicesPoblacion, indicesCruzados);
+
+        System.out.println("Quitamos los que participaron en el offspring");
+        printVector(idxNoCruzados);
 
         //generamos la lista de los no cruzados
         for (int i = 0; i < idxNoCruzados.length; i++) {
             selNoCruzada.add(new Individuo(population.get(idxNoCruzados[i]).getDna(), population.get(idxNoCruzados[i]).getFitness()));
         }
+
         //seleccionamos los sobrevivientes
         int[] idxSobreviven = new int[sobreviven];
         for (int i = 0; i < sobreviven; i++) {
@@ -233,13 +267,18 @@ public class AG1 {
             }
             idxSobreviven[i] = idx;
         }
+        
+        System.out.println("Sobrevivientes");
+        printVector(idxSobreviven);
+        
         //capturamos a los sobrevivientes
         for (int i = 0; i < idxSobreviven.length; i++) {
             sobrevivientes.add(selNoCruzada.get(idxSobreviven[i]));
         }
+        System.out.println("============= FIN Selección no cruzada FIN ==============");
         return sobrevivientes;
     }
-    
+
     protected void print(int[][] paring) {
         int i = 0;
         for (int[] is : paring) {
@@ -300,5 +339,19 @@ public class AG1 {
         for (int i = 0; i < population.size(); i++) {
             System.out.println("score: " + population.get(i).getFitness());
         }
+    }
+
+    private void printVector(int[] vector) {
+        for (int i = 0; i < vector.length; i++) {
+            System.out.printf("%d ", vector[i]);
+        }
+        System.out.println("");
+    }
+
+    private void printPoblacion(List<Individuo> population) {
+        for (int i = 0; i < population.size(); i++) {
+            System.out.printf("(%d: %.3f),", i, population.get(i).getFitness());
+        }
+        System.out.println("");
     }
 }
