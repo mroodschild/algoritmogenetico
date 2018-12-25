@@ -68,7 +68,8 @@ public class AG1_MNUMP {
      * @param offspring porcentaje de numOffspring
      * @param elite porcentaje de elite
      * @param mutation porcentaje de mutación
-     * @param tournament_size tamaño del torneo (no mayor al diez por ciento) en cantidad
+     * @param tournament_size tamaño del torneo (no mayor al diez por ciento) en
+     * cantidad
      */
     public AG1_MNUMP(int epoch, int populationSize, int dnaSize, double offspring, double elite, double mutation, int tournament_size) {
         this(epoch, populationSize, dnaSize, offspring, elite, mutation, tournament_size, -1, 1);
@@ -82,7 +83,8 @@ public class AG1_MNUMP {
      * @param offspring porcentaje de numOffspring
      * @param elite porcentaje de elite
      * @param mutation porcentaje de mutación
-     * @param tournament_size tamaño del torneo (no mayor al diez por ciento) en cantidad
+     * @param tournament_size tamaño del torneo (no mayor al diez por ciento) en
+     * cantidad
      * @param min valores minimos
      * @param max valores maximos
      */
@@ -164,11 +166,13 @@ public class AG1_MNUMP {
             List<Individuo> poblacionSeleccionada) {
         for (int i = popSize - 1; i >= 0; i--) {
             if (i >= (popSize - numElite)) {
-                Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
-                listElite.add(ind);
+//                Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
+//                listElite.add(ind);
+                listElite.add(population.get(i));
             } else {
-                Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
-                poblacionSeleccionada.add(ind);
+//                Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
+//                poblacionSeleccionada.add(ind);
+                poblacionSeleccionada.add(population.get(i));
             }
         }
     }
@@ -239,7 +243,7 @@ public class AG1_MNUMP {
         }
         return sobrevivientes;
     }
-    
+
     protected void print(int[][] paring) {
         int i = 0;
         for (int[] is : paring) {

@@ -33,9 +33,9 @@ public class IndividuoComparator implements Comparator<Individuo> {
     @Override
     public int compare(Individuo o1, Individuo o2) {
         //int value;
-        if (o1.getFitness() < o2.getFitness()) {
+        if (o1.getFitnessMean()< o2.getFitnessMean()) {
             return -1;
-        } else if (o1.getFitness() > o2.getFitness()) {
+        } else if (o1.getFitnessMean()> o2.getFitnessMean()) {
             return 1;
         } else {
             return 0;

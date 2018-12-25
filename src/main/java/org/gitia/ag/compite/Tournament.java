@@ -28,9 +28,11 @@ public class Tournament {
     static Random r = new Random();
 
     /**
-     *
+     * se seleccionan los padres por torneo (un torneo para cada uno) y luego se cruzan
+     * 
      * @param offspring para saber cuantos cruzamientos se requieren
      * @param population para poder seleccionar la elite en el cruzamiento
+     * @param size tamaño del torneo
      * @return los indices de p1 y p2
      */
     public static int[][] getParing(int offspring, List<Individuo> population, int size) {
@@ -49,6 +51,12 @@ public class Tournament {
         return indices;
     }
 
+    /**
+     * 
+     * @param population
+     * @param size
+     * @return 
+     */
     private static int torneo(List<Individuo> population, int size) {
         int[] candidatos = new int[size];
         int ganador;
@@ -57,12 +65,12 @@ public class Tournament {
             candidatos[i] = idx;
         }
         ganador = candidatos[0];
-        double score = population.get(ganador).getFitness();
+        double score = population.get(ganador).getFitnessMean();
         for (int i = 0; i < candidatos.length; i++) {
             Individuo candidato = population.get(candidatos[i]);
-            if (score < candidato.getFitness()) {
+            if (score < candidato.getFitnessMean()) {
                 ganador = candidatos[i];
-                score = candidato.getFitness();
+                score = candidato.getFitnessMean();
             }
         }
         return ganador;

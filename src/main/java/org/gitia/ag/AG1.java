@@ -167,13 +167,15 @@ public class AG1 {
             List<Individuo> poblacionSeleccionada) {
         for (int i = popSize - 1; i >= 0; i--) {
             if (i >= (popSize - numElite)) {
-                Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
+//                Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
                 //System.out.println("Elite: " + i + "\tscore: " + ind.getFitness());
-                listElite.add(ind);
+//                listElite.add(ind);
+                listElite.add(population.get(i));
             } else {
-                Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
+//                Individuo ind = new Individuo(population.get(i).getDna().copy(), population.get(i).getFitness());
                 //System.out.println("Normal: " + i + "\tscore: " + ind.getFitness());
-                poblacionSeleccionada.add(ind);
+//                poblacionSeleccionada.add(ind);
+                poblacionSeleccionada.add(population.get(i));
             }
         }
     }
@@ -255,7 +257,8 @@ public class AG1 {
 
         //generamos la lista de los no cruzados
         for (int i = 0; i < idxNoCruzados.length; i++) {
-            selNoCruzada.add(new Individuo(population.get(idxNoCruzados[i]).getDna(), population.get(idxNoCruzados[i]).getFitness()));
+            //selNoCruzada.add(new Individuo(population.get(idxNoCruzados[i]).getDna(), population.get(idxNoCruzados[i]).getFitness()));
+            selNoCruzada.add(population.get(idxNoCruzados[i]));
         }
 
         //seleccionamos los sobrevivientes

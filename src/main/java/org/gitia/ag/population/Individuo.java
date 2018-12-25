@@ -15,6 +15,8 @@
  */
 package org.gitia.ag.population;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -24,6 +26,7 @@ import org.ejml.simple.SimpleMatrix;
 public class Individuo {
 
     SimpleMatrix dna;
+    List<Double> fit = new ArrayList<>();
     double fitness;
 
     public Individuo() {
@@ -34,24 +37,60 @@ public class Individuo {
         this.fitness = fitness;
     }
 
-    public void setDna(SimpleMatrix dna) {
+    public Individuo(SimpleMatrix dna, double fitness, List<Double> fit) {
         this.dna = dna;
+        this.fitness = fitness;
+        this.fit.addAll(fit);
     }
 
     public void setFitness(double fitness) {
         this.fitness = fitness;
-    }
-    
-    public void addFitness(double fitness){
-        this.fitness += fitness;
+        fit.add(fitness);
     }
 
+    /**
+     * suma el total de todos los fitness obtenidos y devuelve el promedio
+     *
+     * @return
+     */
+    public double getFitnessMean() {
+        double total = 0;
+        double size = fit.size();
+        double promedio = 0;
+        for (int i = 0; i < size; i++) {
+            total += fit.get(i);
+        }
+        if (!fit.isEmpty()) {
+            promedio = total / size;
+        }
+        return promedio;
+    }
+
+    //    public void addFitness(double fitness){
+//        this.fitness += fitness;
+//    }
     public SimpleMatrix getDna() {
         return dna;
     }
 
+    /**
+     * devuelve el fitness actual
+     *
+     * @return
+     */
     public double getFitness() {
         return fitness;
     }
 
+    public void setDna(SimpleMatrix dna) {
+        this.dna = dna;
+    }
+
+    public List<Double> getFit() {
+        return fit;
+    }
+
+    public void setFit(List<Double> fit) {
+        this.fit = fit;
+    }
 }
