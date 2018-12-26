@@ -338,11 +338,11 @@ public class AG1 {
         this.dnaSize = dnaSize;
     }
 
-    private void print(List<Individuo> population) {
-        for (int i = 0; i < population.size(); i++) {
-            System.out.println("score: " + population.get(i).getFitness());
-        }
-    }
+//    private void print(List<Individuo> population) {
+//        for (int i = 0; i < population.size(); i++) {
+//            System.out.println("score: " + population.get(i).getFitness());
+//        }
+//    }
 
     private void printVector(int[] vector) {
         for (int i = 0; i < vector.length; i++) {
@@ -353,7 +353,7 @@ public class AG1 {
 
     private void printPoblacion(List<Individuo> population) {
         for (int i = 0; i < population.size(); i++) {
-            System.out.printf("(%d: %.3f),", i, population.get(i).getFitness());
+            System.out.printf("(%d: %.3f),", i, population.get(i).getFitnessMean());
         }
         System.out.println("");
     }
