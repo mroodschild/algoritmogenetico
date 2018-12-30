@@ -352,7 +352,8 @@ public class AG1 {
     }
 
     private void printPoblacion(List<Individuo> population) {
-        for (int i = 0; i < population.size(); i++) {
+        int size = population.size()-1;
+        for (int i = size; i >= 0; i--) {
             System.out.printf("(%d: %.3f),", i, population.get(i).getFitnessMean());
         }
         System.out.println("");
